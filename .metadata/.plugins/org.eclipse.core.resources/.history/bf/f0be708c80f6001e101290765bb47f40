@@ -1,0 +1,26 @@
+package com.example.demo;
+
+import org.springframework.stereotype.Component;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
+import java.io.IOException;
+
+@Component
+public class DockerContainerManager {
+
+    private Process process;
+
+    @PostConstruct
+    public void startContainers() throws IOException {
+        // Execute the script to start Docker containers
+        process = Runtime.getRuntime().exec("../../../../resources/script.sh");
+    }
+
+    @PreDestroy
+    public void stopContainers() throws IOException {
+        // Execute the script to stop Docker containers
+        Runtime.getRuntime().exec("../../../../resources/end.sh");
+    }
+}

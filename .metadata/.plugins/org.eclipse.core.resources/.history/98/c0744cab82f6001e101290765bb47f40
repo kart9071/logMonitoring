@@ -1,0 +1,44 @@
+package com.example.demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+
+import javax.annotation.PreDestroy;
+import java.io.File;
+import java.io.IOException;
+
+@Configuration
+public class DockerContainerManager {
+
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    private Process process;
+
+    @Bean
+    public void startContainers() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:docker-compose.yml");
+        File dockerComposeFile = resource.getFile();
+        String dockerComposeFilePath = dockerComposeFile.getAbsolutePath();
+        
+        // Execute the script to start Docker containers
+        process = Runtime.getRuntime().exec(dockerComposeFilePath + "/start.sh");
+    }
+
+    @PreDestroy
+    public void stopContainers() throws IOException {
+        if (process != null) {
+            process.destroy(); // Stop the process if it's running
+        }
+        
+        Resource resource = resourceLoader.getResource("classpath:docker-compose.yml");
+        File dockerComposeFile = resource.getFile();
+        String dockerComposeFilePath = dockerComposeFile.getAbsolutePath();
+        
+        // Execute the script to stop Docker containers
+        Runtime.getRuntime().exec(dockerComposeFilePath + "/stop.sh");
+    }
+}
